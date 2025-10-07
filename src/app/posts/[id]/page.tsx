@@ -4,16 +4,15 @@ interface Post {
   body: string;
 }
 
-interface Props {
-  params: { id: string };
-}
+type Params = Promise<{ id: string }>;
 
-export default async function PostDetailPage({ params }: Props) {
-  const { id } = params;
+export const dynamic = "force-dynamic";
 
-  // Fetch data di server setiap kali halaman dibuka → SSR
+export default async function PostDetailPage({ params }: { params: Params }) {
+  const { id } = await params; // ✅ ini yang benar di Next.js 15
+
   const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-    cache: "no-store", // penting untuk SSR (tidak cache)
+    cache: "no-store",
   });
 
   if (!res.ok) {
@@ -28,10 +27,7 @@ export default async function PostDetailPage({ params }: Props) {
         <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
         <p className="text-gray-700 leading-relaxed">{post.body}</p>
 
-        <a
-          href="/"
-          className="inline-block mt-6 text-blue-600 hover:underline"
-        >
+        <a href="/" className="inline-block mt-6 text-blue-600 hover:underline">
           ← Kembali ke daftar
         </a>
       </div>
